@@ -20,13 +20,18 @@ jobs:
       - name: Sync package.json version with git tag
         run: |
           version=${GITHUB_REF#refs/tags/}
-          echo "Bumping package.json to version $version"
-          npm version $version --no-git-tag-version
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          git add package.json
-          git commit -m "chore(release): bump to $version"
-          git push origin HEAD:${{ github.ref_name }}
+          current=$(node -pe "require('./package.json').version")
+          if [ "$current" != "$version" ]; then
+            echo "Bumping package.json from $current to $version"
+            npm version $version --no-git-tag-version
+            git config user.name "${{ github.actor }}"
+            git config user.email "${{ github.actor }}@users.noreply.github.com"
+            git add package.json
+            git commit -m "chore(release): bump to $version"
+            git push origin HEAD:${{ github.ref_name }}
+          else
+            echo "package.json already at version $version; skipping bump."
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
