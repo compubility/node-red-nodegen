@@ -1,0 +1,60 @@
+name: Auto Tag New Releases
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  tag_release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          registry-url: 'https://npm.pkg.github.com'
+
+      - name: Determine version bump
+        id: bump
+        run: |
+          BRANCH=${{ github.event.pull_request.head.ref }}
+          echo "Branch: $BRANCH"
+          if [[ "$BRANCH" =~ ^(feat|feature) ]]; then
+            echo "bump=minor" >> $GITHUB_OUTPUT
+          elif [[ "$BRANCH" =~ ^(major|breaking) ]]; then
+            echo "bump=major" >> $GITHUB_OUTPUT
+          elif [[ "$BRANCH" =~ ^(bug|fix) ]]; then
+            echo "bump=patch" >> $GITHUB_OUTPUT
+          else
+            echo "bump=minor" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Bump package.json version
+        run: |
+          npm config set //npm.pkg.github.com/:_authToken ${{ secrets.GITHUB_TOKEN }}
+          VERSION_OUTPUT=$(npm version ${{ steps.bump.outputs.bump }} --no-git-tag-version)
+          echo "New version from npm: $VERSION_OUTPUT"
+          # Commit updated package.json and package-lock.json (if any)
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add package.json package-lock.json
+          git commit -m "chore(release): bump to $VERSION_OUTPUT"
+
+      - name: Create git tag and push
+        run: |
+          TAG=v${VERSION_OUTPUT#v}
+          echo "Pushing tag $TAG"
+          git tag $TAG
+          git push origin HEAD:${{ github.event.pull_request.base.ref }}
+          git push origin $TAG
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

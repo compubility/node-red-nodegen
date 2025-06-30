@@ -1,0 +1,52 @@
+name: Publish Package to GitHub Packages
+
+on:
+  push:
+    # Trigger on version tags like v1.0.0
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  publish:
+    name: Publish to GitHub Packages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Sync package.json version with git tag
+        run: |
+          version=${GITHUB_REF#refs/tags/}
+          echo "Bumping package.json to version $version"
+          npm version $version --no-git-tag-version
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git add package.json
+          git commit -m "chore(release): bump to $version"
+          git push origin HEAD:${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@compubility'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Copy templates
+        run: node dist/scripts/copy-templates.js
+
+      - name: Publish to GitHub Packages
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
