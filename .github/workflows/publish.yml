@@ -8,13 +8,12 @@ on:
         required: false
         default: ''
   push:
-    # Trigger on version tags like v1.0.0
     tags:
       - 'v*.*.*'
 
 jobs:
   publish:
-    name: Publish to GitHub Packages
+    name: Publish to npmjs
     runs-on: ubuntu-latest
 
     steps:
@@ -61,10 +60,8 @@ jobs:
             echo "package.json already at version $VERSION; skipping bump."
           fi
 
-
       - name: Authenticate to npmjs
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
-
 
       - name: Install dependencies
         run: npm install
@@ -75,7 +72,7 @@ jobs:
       - name: Copy templates
         run: node dist/scripts/copy-templates.js
 
-      - name: Publish to GitHub Packages
-        run: npm publish --access public --registry https://npm.pkg.github.com
+      - name: Publish to npmjs
+        run: npm publish --access public
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
