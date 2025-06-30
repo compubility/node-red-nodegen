@@ -61,18 +61,10 @@ jobs:
             echo "package.json already at version $VERSION; skipping bump."
           fi
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22'
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@compubility'
-          always-auth: true
 
-      - name: Authenticate to GitHub Packages
-        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> ~/.npmrc
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Authenticate to npmjs
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+
 
       - name: Install dependencies
         run: npm install

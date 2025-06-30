@@ -18,6 +18,9 @@
     "type": "git",
     "url": "git+https://github.com/compubility/node-red-nodegen.git"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "keywords": [
     "node-red",
     "cli",
