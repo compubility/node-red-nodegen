@@ -1,5 +1,5 @@
 {
-  "name": "@compubility/node-red-nodegen",
+  "name": "@a8n/node-red-nodegen",
   "version": "1.0.0",
   "description": "CLI tool to generate Node-RED node templates",
   "type": "module",
