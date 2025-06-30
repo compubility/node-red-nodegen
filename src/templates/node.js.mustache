@@ -1,0 +1,14 @@
+module.exports = function(RED) {
+    function {{functionName}}(config) {
+        RED.nodes.createNode(this, config);
+        var node = this;
+
+        node.on('input', function(msg, send, done) {
+            msg.payload = "Hello from {{name}} node";
+            send(msg);
+            done();
+        });
+    }
+
+    RED.nodes.registerType("{{name}}", {{functionName}});
+}

@@ -1,0 +1,34 @@
+module.exports = function(RED) {
+    function {{name}}(config) {
+        RED.nodes.createNode(this, config);
+        var node = this;
+
+        node.on("input", async function(msg, send, done) {
+            try {
+                const axios = require("axios");
+
+                const url = `{{baseUrl}}{{path}}`
+                    .replace(/{{({{)?(.+?)(}})?}}/g, (_, __, key) => msg.payload?.[key] ?? "");
+
+                const response = await axios({
+                    method: "{{method}}",
+                    url,
+                {{#hasRequestBody}}
+                data: msg.payload,
+                    {{/hasRequestBody}}
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                msg.payload = response.data;
+                send(msg);
+                done();
+            } catch (err) {
+                    done(err);
+                }
+            });
+            }
+
+            RED.nodes.registerType("{{name}}", {{name}});
+};

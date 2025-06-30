@@ -1,0 +1,48 @@
+{
+  "name": "@compubility/node-red-nodegen",
+  "version": "1.0.0",
+  "description": "CLI tool to generate Node-RED node templates",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "nrg": "dist/index.js"
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "postbuild": "node dist/scripts/copy-templates.js && chmod +x dist/index.js",
+    "start": "ts-node src/index.ts",
+    "test": "playwright test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/compubility/node-red-nodegen.git"
+  },
+  "keywords": [
+    "node-red",
+    "cli",
+    "template",
+    "generator"
+  ],
+  "author": "Compubility",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/compubility/node-red-nodegen/issues"
+  },
+  "homepage": "https://github.com/compubility/node-red-nodegen#readme",
+  "dependencies": {
+    "@apidevtools/swagger-parser": "^12.0.0",
+    "chalk": "^5.4.1",
+    "commander": "^14.0.0",
+    "mustache": "^4.2.0",
+    "openapi-types": "^12.1.3"
+  },
+  "devDependencies": {
+    "@types/mustache": "^4.2.6",
+    "@types/node": "^24.0.4",
+    "playwright": "^1.40.0",
+    "rimraf": "^6.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
