@@ -1,6 +1,6 @@
 {
   "name": "@a8n/node-red-nodegen",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CLI tool to generate Node-RED node templates",
   "type": "module",
   "main": "dist/index.js",
